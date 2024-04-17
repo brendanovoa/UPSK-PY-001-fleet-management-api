@@ -15,8 +15,41 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include # Función path se usa para definir URL en una app Django
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+from rest_framework import permissions
+from drf_yasg.utils import swagger_auto_schema
+
+# Define los parámetros de paginación
+# page_parameter = openapi.Parameter('page', openapi.IN_QUERY, description="Número de página a recuperar", type=openapi.TYPE_INTEGER)
+
+# Define la vista de esquema
+schema_view = get_schema_view(
+    openapi.Info(
+        title="API Fleet Management",
+        default_version='v1',
+        description="API para la gestión de taxis y trayectorias.",
+        terms_of_service="https://www.example.com/policies/terms/",
+        contact=openapi.Contact(email="contact@example.com"),
+        license=openapi.License(name="BSD License"),
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+)
+
+# Define los parámetros de paginación
+page_parameter = openapi.Parameter('page', openapi.IN_QUERY, description="Número de página a recuperar", type=openapi.TYPE_INTEGER)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('fleet-management/', include('management.urls')),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
+
+# Define el prefijo base para todas las URLs de tu API
+# base_api_path = 'fleet-managment/'
+
+# path(f'{base_api_path}api/taxis/', list_taxis, name='list_taxis')
+#URL para acceder a la documentación en swagger

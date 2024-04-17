@@ -1,3 +1,4 @@
+# La clase models de Django, se utiliza para definir modelos de base de datos.
 from django.db import models
 
 # Create your models here.
