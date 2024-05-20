@@ -14,11 +14,13 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
 from django.urls import path, include # Función path se usa para definir URL en una app Django
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import permissions
+from management.views import list_taxis, obtener_ubicaciones_taxi
 from drf_yasg.utils import swagger_auto_schema
 
 # Define los parámetros de paginación

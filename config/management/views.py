@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.core.paginator import Paginator, EmptyPage,PageNotAnInteger
 from django.http import JsonResponse
-from .models import taxis
+from .models import taxis, trajectories
 # from .serializers import TaxisSerializer
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
@@ -66,3 +66,43 @@ def list_taxis(request):
 
     # taxis_serializer = TaxisSerializer(taxis_page, many=True)
     # taxis_data = taxis_serializer.data
+
+@api_view(['GET'])
+@swagger_auto_schema(
+    operation_description="Obtiene las ubicaciones de un taxi dado su ID y una fecha.",
+    responses={200: 'OK', 400: 'Bad Request', 404: 'Not Found'},
+    manual_parameters=[
+        openapi.Parameter(
+            name='id_taxi',
+            in_=openapi.IN_QUERY,
+            type=openapi.TYPE_INTEGER,
+            description='ID del taxi.'
+        ),
+        openapi.Parameter(
+            name='fecha',
+            in_=openapi.IN_QUERY,
+            type=openapi.TYPE_STRING,
+            description='Fecha en formato YYYY-MM-DD.'
+        ),
+    ]
+)
+
+def obtener_ubicaciones_taxi(request):
+    try:
+        id_taxi = request.GET.get('id_taxi')
+        #self.request.query_params.get('taxi_id')
+        fecha = request.GET.get('fecha')
+
+        # Consulta a la base de datos para obtener las ubicaciones del taxi dado su ID y fecha
+        ubicaciones = trajectories.objects.filter(taxi_id=id_taxi, date=fecha)
+
+        ubicaciones_data = [{
+            'latitud': ubicacion.latitud,
+            'longitud': ubicacion.longitud,
+            'timestamp': ubicacion.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+        } for ubicacion in ubicaciones]
+
+        return Response(ubicaciones_data, status=200) 
+    except Exception as e:
+        error_message = "Error al obtener las ubicaciones del taxi: " + str(e)
+        return Response({"error": error_message}, status=400) 
